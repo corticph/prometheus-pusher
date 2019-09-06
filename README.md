@@ -2,7 +2,7 @@
 > `prometheus-pusher` aggregates [Prometheus](https://prometheus.io/) metrics from different endpoints and pushes them to [pushgateway](https://github.com/prometheus/pushgateway) This component scrapes metrics from CockroachDB and pushes to our gateway. 
 
 ## Run it
-`./prometheus-runner -config="conf.d"
+`./prometheus-runner -config="conf.d"`
 
 ## Usage
 See `-help`.
