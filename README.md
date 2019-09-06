@@ -1,15 +1,8 @@
 # prometheus-pusher
-> `prometheus-pusher` aggregates [Prometheus](https://prometheus.io/) metrics from different endpoints and pushes them to [pushgateway](https://github.com/prometheus/pushgateway)
+> `prometheus-pusher` aggregates [Prometheus](https://prometheus.io/) metrics from different endpoints and pushes them to [pushgateway](https://github.com/prometheus/pushgateway) This component scrapes metrics from CockroachDB and pushes to our gateway. 
 
-## Architecture
-![prometheus-pusher Architecture](https://github.com/Showmax/prometheus-pusher/blob/master/pusher.png?raw=true)
-
-`prometheus-pusher` fetches metrics data from configured resources in specified interval and does inverse multiplexing on each metric, where destination for each one is decided by the prefix of metric name specified in route map file.
-
-## Installation
-```
-$ go get -u github.com/Showmax/prometheus-pusher
-```
+## Run it
+`./prometheus-runner -config="conf.d"
 
 ## Usage
 See `-help`.
