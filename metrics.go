@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/prometheus/common/expfmt"
-	"github.com/prometheus/common/model"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/common/model"
 )
 
 // metrics scanner
@@ -53,6 +54,7 @@ func newMetric(m *metrics, idx int, rm *routeMap, ts *[]byte, cfg *pusherConfig)
 		allSamples = make(model.Samples, 0, 1)
 		decSamples = make(model.Vector, 0, 1)
 	)
+
 	fullMetricLine := bytes.Join(mf, []byte{' '})
 	fullMetricLine = bytes.Join([][]byte{fullMetricLine, []byte("\n")}, []byte{})
 	sdec := expfmt.SampleDecoder{
@@ -86,7 +88,13 @@ func newMetric(m *metrics, idx int, rm *routeMap, ts *[]byte, cfg *pusherConfig)
 				sample.Metric[model.LabelName(labelName)] = model.LabelValue(labelValue)
 			}
 		}
-		metric := fmt.Sprintf("%s %s %s", sample.Metric, sample.Value, *ts)
+		metricOld := fmt.Sprintf("%s %s %s", sample.Metric, sample.Value, *ts)
+
+		if len(metricOld) < 0 {
+			continue
+		}
+
+		metric := fmt.Sprintf("%s %s", sample.Metric, sample.Value)
 		buffer.WriteString(metric)
 	}
 
@@ -195,14 +203,23 @@ func (m *metrics) imux(rm *routeMap, cfg *pusherConfig) map[string][]byte {
 		cmts = append(cmts, newComment(m, c)...)
 	}
 
+	deDup := make(map[string]bool)
+
 	// reduce []byte and prepend with comments
 	for metric := range ch {
 		for _, dst := range metric.dsts {
 			if len(r[dst]) == 0 {
 				r[dst] = append(r[dst], cmts...)
 			}
+
+			if ok, _ := deDup[string(metric.bytes)]; ok {
+				continue
+			}
+
 			r[dst] = append(r[dst], metric.bytes...)
 			r[dst] = append(r[dst], byte('\n'))
+
+			deDup[string(metric.bytes)] = true
 		}
 	}
 

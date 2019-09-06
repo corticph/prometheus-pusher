@@ -120,6 +120,10 @@ func (r *resource) getMetrics() []byte {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	// msg := string(body)
+
+	// print(msg)
+
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"error":         err.Error(),
@@ -147,7 +151,9 @@ func (r *resource) getMetrics() []byte {
 func (r *resource) pushMetrics(metrics []byte, dst string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	postURL := fmt.Sprintf(r.pushGatewayURL, dst) + fmt.Sprintf("/job/%s/instance/%s", r.name, hostname)
+	// postURL := fmt.Sprintf(r.pushGatewayURL, dst) + fmt.Sprintf("/job/%s/instance/%s", r.name, hostname)
+	postURL := r.pushGatewayURL + "/metrics/job/" + r.name //+ fmt.Sprintf("/job/%s/instance/%s", r.name, hostname)
+
 	if dummy {
 		printMutex.Lock()
 		defer printMutex.Unlock()
